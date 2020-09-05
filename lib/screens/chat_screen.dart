@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_socket_io/flutter_socket_io.dart';
+import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/message_bubble.dart';
 
@@ -12,6 +15,8 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  SocketIO socketIO;
+  ScrollController scrollController;
   final messageController = TextEditingController();
   String messageText;
   List<Widget> messageWidgets = List<Widget>();
@@ -20,6 +25,39 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     super.dispose();
     messageController.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController = ScrollController();
+    //Creating the socket
+    socketIO = SocketIOManager().createSocketIO(
+      'https://wit-bot-server.herokuapp.com/',
+      '/',
+    );
+    //Call init before doing anything with socket
+    socketIO.init();
+    print('In initState');
+    //Subscribe to an event to listen to
+    socketIO.subscribe('receive_message', (jsonData) {
+      print('In receive_message');
+      //Convert the JSON data received into a Map
+
+      Map<String, dynamic> data = json.decode(jsonData);
+      this.setState(
+        () => messageWidgets.add(
+          MessageBubble(sender: '@foobot', response: data, isMe: false),
+        ),
+      );
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 600),
+        curve: Curves.ease,
+      );
+    });
+    //Connect to the socket
+    socketIO.connect();
   }
 
   @override
@@ -50,6 +88,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Expanded(
               child: Container(
                 child: ListView.builder(
+                    controller: scrollController,
                     physics: BouncingScrollPhysics(),
                     padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
                     itemCount: messageWidgets.length,
@@ -57,8 +96,8 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Container(
+              padding: EdgeInsets.only(left: 8.0, bottom: 8, right: 8, top: 4),
               decoration: kMessageContainerDecoration,
-              margin: EdgeInsets.only(left: 4, bottom: 4),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
@@ -71,16 +110,33 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: kMessageTextFieldDecoration,
                     ),
                   ),
-                  FlatButton(
-                    onPressed: () {
+                  SizedBox(
+                    width: 8,
+                  ),
+                  GestureDetector(
+                    onTap: () {
                       setState(() {
+                        //Send the message as JSON data to send_message event
+                        socketIO.sendMessage(
+                          'send_query',
+                          json.encode({'message': messageText}),
+                        );
                         messageWidgets.add(
                           MessageBubble(
-                              sender: '@darlene',
-                              text: messageText,
-                              isMe: true),
+                            sender: '@darlene',
+                            response: {
+                              'intent': 'random',
+                              'text': messageText,
+                            },
+                            isMe: true,
+                          ),
                         );
                         messageController.clear();
+                        scrollController.animateTo(
+                          scrollController.position.maxScrollExtent,
+                          duration: Duration(milliseconds: 600),
+                          curve: Curves.ease,
+                        );
                       });
                     },
                     child: Transform.rotate(
