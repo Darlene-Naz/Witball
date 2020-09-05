@@ -11,10 +11,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   cupertino_icons: ^0.1.3
   animated_text_kit:
   web_socket_channel:
   flutter_socket_io:
+  flutter_svg:
+  intl:
 
 dev_dependencies:
   flutter_test:

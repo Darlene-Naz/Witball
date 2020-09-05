@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class FixtureTile extends StatelessWidget {
   FixtureTile(
@@ -10,6 +12,10 @@ class FixtureTile extends StatelessWidget {
       this.matchday});
   final String homeTeam, homeTeamCrest, awayTeam, awayTeamCrest;
   final String datetimeOfMatch;
+  final DateFormat formatter = DateFormat(
+    'dd-MM-yy',
+  ).add_jm();
+
   final int matchday;
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class FixtureTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                child: Image.network(homeTeamCrest),
+                child: SvgPicture.network(homeTeamCrest),
                 radius: 20,
               ),
               Text(
@@ -40,7 +46,12 @@ class FixtureTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(matchday.toString()),
-              Text(datetimeOfMatch.toString()),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                formatter.format(DateTime.parse(datetimeOfMatch).toLocal()),
+              ),
             ],
           ),
           Column(
@@ -49,7 +60,7 @@ class FixtureTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                child: Image.network(awayTeamCrest),
+                child: SvgPicture.network(awayTeamCrest),
                 radius: 20,
               ),
               Text(
