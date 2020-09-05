@@ -45,8 +45,10 @@ class _ChatScreenState extends State<ChatScreen> {
       //Convert the JSON data received into a Map
 
       Map<String, dynamic> data = json.decode(jsonData);
+      print(data);
       this.setState(
-        () => messageWidgets.add(
+        () => messageWidgets.insert(
+          0,
           MessageBubble(sender: '@foobot', response: data, isMe: false),
         ),
       );
@@ -88,6 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Expanded(
               child: Container(
                 child: ListView.builder(
+                    reverse: true,
                     controller: scrollController,
                     physics: BouncingScrollPhysics(),
                     padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
@@ -113,20 +116,21 @@ class _ChatScreenState extends State<ChatScreen> {
                   SizedBox(
                     width: 8,
                   ),
-                  GestureDetector(
-                    onTap: () {
+                  FloatingActionButton(
+                    onPressed: () {
                       setState(() {
                         //Send the message as JSON data to send_message event
                         socketIO.sendMessage(
                           'send_query',
                           json.encode({'message': messageText}),
                         );
-                        messageWidgets.add(
+                        messageWidgets.insert(
+                          0,
                           MessageBubble(
                             sender: '@darlene',
                             response: {
-                              'intent': 'random',
-                              'text': messageText,
+                              'type': 'string',
+                              'message': messageText,
                             },
                             isMe: true,
                           ),
@@ -143,7 +147,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         angle: -math.pi / 6,
                         child: Icon(
                           Icons.send,
-                          color: Colors.amber,
                           size: 24,
                         )),
                     // child: Text(
