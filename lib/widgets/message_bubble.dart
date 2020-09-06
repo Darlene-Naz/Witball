@@ -13,7 +13,7 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return response['type'] == 'string'
         ? Padding(
-            padding: EdgeInsets.all(10.0),
+            padding: EdgeInsets.only(top: 10.0, bottom: 10),
             child: Column(
               crossAxisAlignment:
                   isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -69,46 +69,45 @@ class ShowPlayersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '@foobot',
-            style: TextStyle(
-              fontSize: 12.0,
-              color: Colors.black54,
-            ),
+          MessageBubble(
+            sender: '@witbot',
+            response: {
+              'type': 'string',
+              'message': 'Players of ${response['teamName']}...'
+            },
+            isMe: false,
           ),
-          Material(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30.0),
-              bottomRight: Radius.circular(30.0),
-              topRight: Radius.circular(30.0),
-            ),
+          Card(
+            margin: EdgeInsets.only(left: 0, top: 8),
             elevation: 5.0,
-            color: Colors.white,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-              child: Text(
-                'Players of ${response['teamName']}',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 15.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.4,
+              margin: EdgeInsets.all(4),
+              child: SingleChildScrollView(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: RangeMaintainingScrollPhysics(),
+                  itemBuilder: (context, index) => PlayerTile(
+                    name: response['object'][index]['name'],
+                    nationality: response['object'][index]['nationality'],
+                    position: response['object'][index]['position'],
+                    url: response['crestUrl'],
+                  ),
+                  itemCount: response['object'].length,
                 ),
               ),
             ),
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => PlayerTile(
-              name: response['object'][index]['name'],
-              nationality: response['object'][index]['nationality'],
-              position: response['object'][index]['position'],
-              url: response['crestUrl'],
-            ),
-            itemCount: response['object'].length,
+          MessageBubble(
+            sender: '',
+            response: {'type': 'string', 'message': 'Hope this helps!'},
+            isMe: false,
           ),
         ],
       ),
