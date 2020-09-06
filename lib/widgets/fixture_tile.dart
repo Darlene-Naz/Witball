@@ -45,7 +45,7 @@ class FixtureTile extends StatelessWidget {
                   width: MediaQuery.of(context).size.width / 4,
                   child: Text(
                     homeTeam,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 )
               ],
@@ -86,7 +86,9 @@ class FixtureTile extends StatelessWidget {
                   width: MediaQuery.of(context).size.width / 4,
                   child: Text(
                     awayTeam,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    softWrap: true,
+                    overflow: TextOverflow.clip,
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

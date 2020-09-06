@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foo_bot/widgets/fixture_tile.dart';
+import 'package:foo_bot/widgets/player_tile.dart';
 
 class MessageBubble extends StatelessWidget {
   MessageBubble({this.sender, this.response, this.isMe});
@@ -67,7 +68,7 @@ class ShowPlayersList extends StatelessWidget {
   final Map<String, dynamic> response;
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,9 +80,34 @@ class ShowPlayersList extends StatelessWidget {
               color: Colors.black54,
             ),
           ),
+          Material(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.0),
+              bottomRight: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+            ),
+            elevation: 5.0,
+            color: Colors.white,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              child: Text(
+                'Players of ${response['teamName']}',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 15.0,
+                ),
+              ),
+            ),
+          ),
           ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemBuilder: (context, index) => response['object'],
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) => PlayerTile(
+              name: response['object'][index]['name'],
+              nationality: response['object'][index]['nationality'],
+              position: response['object'][index]['position'],
+              url: response['crestUrl'],
+            ),
             itemCount: response['object'].length,
           ),
         ],
