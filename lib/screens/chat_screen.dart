@@ -143,11 +143,12 @@ class _ChatScreenState extends State<ChatScreen> {
                       });
                     },
                     child: Transform.rotate(
-                        angle: -math.pi / 6,
-                        child: Icon(
-                          Icons.send,
-                          size: 24,
-                        )),
+                      angle: -math.pi / 6,
+                      child: Icon(
+                        Icons.send,
+                        size: 24,
+                      ),
+                    ),
                     // child: Text(
                     //   'Send',
                     //   style: kSendButtonTextStyle,

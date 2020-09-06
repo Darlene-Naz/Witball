@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foo_bot/widgets/fixture_tile.dart';
+import 'package:foo_bot/widgets/player_tile.dart';
 
 class MessageBubble extends StatelessWidget {
   MessageBubble({this.sender, this.response, this.isMe});
@@ -67,7 +68,7 @@ class ShowPlayersList extends StatelessWidget {
   final Map<String, dynamic> response;
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,9 +80,22 @@ class ShowPlayersList extends StatelessWidget {
               color: Colors.black54,
             ),
           ),
+          ListTile(
+            title: Text(
+              'Players of ${response['teamName']}',
+              softWrap: true,
+              overflow: TextOverflow.visible,
+            ),
+          ),
           ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemBuilder: (context, index) => response['object'],
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) => PlayerTile(
+              name: response['object'][index]['name'],
+              nationality: response['object'][index]['nationality'],
+              position: response['object'][index]['position'],
+              url: response['crestUrl'],
+            ),
             itemCount: response['object'].length,
           ),
         ],
@@ -95,38 +109,34 @@ class ShowFixturesList extends StatelessWidget {
   final Map<String, dynamic> response;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '@witbot',
-            style: TextStyle(
-              fontSize: 12.0,
-              color: Colors.black54,
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '@witbot',
+          style: TextStyle(
+            fontSize: 12.0,
+            color: Colors.black54,
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-            height: MediaQuery.of(context).size.height * 0.35,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemBuilder: (context, index) => FixtureTile(
-                homeTeam: response['object'][index]['homeTeam'],
-                awayTeam: response['object'][index]['awayTeam'],
-                homeTeamCrest: response['object'][index]['homeTeamCrest'],
-                awayTeamCrest: response['object'][index]['awayTeamCrest'],
-                datetimeOfMatch: response['object'][index]['datetimeOfMatch'],
-                matchday: response['object'][index]['matchday'],
-              ),
-              itemCount: response['object'].length,
+        ),
+        Container(
+          height: MediaQuery.of(context).size.height * 0.25,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
+            itemBuilder: (context, index) => FixtureTile(
+              homeTeam: response['object'][index]['homeTeam'],
+              awayTeam: response['object'][index]['awayTeam'],
+              homeTeamCrest: response['object'][index]['homeTeamCrest'],
+              awayTeamCrest: response['object'][index]['awayTeamCrest'],
+              datetimeOfMatch: response['object'][index]['datetimeOfMatch'],
+              matchday: response['object'][index]['matchday'],
             ),
+            itemCount: response['object'].length,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
