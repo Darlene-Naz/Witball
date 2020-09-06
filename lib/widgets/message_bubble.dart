@@ -95,38 +95,34 @@ class ShowFixturesList extends StatelessWidget {
   final Map<String, dynamic> response;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '@witbot',
-            style: TextStyle(
-              fontSize: 12.0,
-              color: Colors.black54,
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '@witbot',
+          style: TextStyle(
+            fontSize: 12.0,
+            color: Colors.black54,
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-            height: MediaQuery.of(context).size.height * 0.35,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemBuilder: (context, index) => FixtureTile(
-                homeTeam: response['object'][index]['homeTeam'],
-                awayTeam: response['object'][index]['awayTeam'],
-                homeTeamCrest: response['object'][index]['homeTeamCrest'],
-                awayTeamCrest: response['object'][index]['awayTeamCrest'],
-                datetimeOfMatch: response['object'][index]['datetimeOfMatch'],
-                matchday: response['object'][index]['matchday'],
-              ),
-              itemCount: response['object'].length,
+        ),
+        Container(
+          height: MediaQuery.of(context).size.height * 0.25,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
+            itemBuilder: (context, index) => FixtureTile(
+              homeTeam: response['object'][index]['homeTeam'],
+              awayTeam: response['object'][index]['awayTeam'],
+              homeTeamCrest: response['object'][index]['homeTeamCrest'],
+              awayTeamCrest: response['object'][index]['awayTeamCrest'],
+              datetimeOfMatch: response['object'][index]['datetimeOfMatch'],
+              matchday: response['object'][index]['matchday'],
             ),
+            itemCount: response['object'].length,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
