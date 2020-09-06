@@ -18,18 +18,22 @@ class ShowFixturesList extends StatelessWidget {
         ),
         Container(
           height: MediaQuery.of(context).size.height * 0.25,
-          child: ListView.builder(
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            itemBuilder: (context, index) => FixtureTile(
-              homeTeam: response['object'][index]['homeTeam'],
-              awayTeam: response['object'][index]['awayTeam'],
-              homeTeamCrest: response['object'][index]['homeTeamCrest'],
-              awayTeamCrest: response['object'][index]['awayTeamCrest'],
-              datetimeOfMatch: response['object'][index]['datetimeOfMatch'],
-              matchday: response['object'][index]['matchday'],
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemBuilder: (context, index) => FixtureTile(
+                homeTeam: response['object'][index]['homeTeam'],
+                awayTeam: response['object'][index]['awayTeam'],
+                homeTeamCrest: response['object'][index]['homeTeamCrest'],
+                awayTeamCrest: response['object'][index]['awayTeamCrest'],
+                datetimeOfMatch: response['object'][index]['datetimeOfMatch'],
+                matchday: response['object'][index]['matchday'],
+              ),
+              itemCount: response['object'].length,
             ),
-            itemCount: response['object'].length,
           ),
         ),
       ],

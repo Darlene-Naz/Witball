@@ -21,10 +21,11 @@ class FixtureTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 5.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
-      margin: EdgeInsets.only(right: 8, top: 4, bottom: 8),
+      margin: EdgeInsets.only(right: 12, top: 4, bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -45,6 +46,7 @@ class FixtureTile extends StatelessWidget {
                   width: MediaQuery.of(context).size.width / 4,
                   child: Text(
                     homeTeam,
+                    textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 )
@@ -57,6 +59,7 @@ class FixtureTile extends StatelessWidget {
               children: [
                 Text(
                   matchday.toString(),
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(
@@ -88,6 +91,7 @@ class FixtureTile extends StatelessWidget {
                     awayTeam,
                     softWrap: true,
                     overflow: TextOverflow.clip,
+                    textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 ),
