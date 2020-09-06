@@ -79,10 +79,8 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             // Column(
             //   children: messageWidgets,
@@ -106,6 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       controller: messageController,
                       onChanged: (value) {
                         messageText = value;
