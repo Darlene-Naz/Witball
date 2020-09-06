@@ -80,11 +80,23 @@ class ShowPlayersList extends StatelessWidget {
               color: Colors.black54,
             ),
           ),
-          ListTile(
-            title: Text(
-              'Players of ${response['teamName']}',
-              softWrap: true,
-              overflow: TextOverflow.visible,
+          Material(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.0),
+              bottomRight: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+            ),
+            elevation: 5.0,
+            color: Colors.white,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              child: Text(
+                'Players of ${response['teamName']}',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 15.0,
+                ),
+              ),
             ),
           ),
           ListView.builder(
