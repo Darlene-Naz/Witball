@@ -15,6 +15,7 @@ dependencies:
   animated_text_kit:
   web_socket_channel:
   flutter_socket_io:
+  flutter_svg:
 
 dev_dependencies:
   flutter_test:
