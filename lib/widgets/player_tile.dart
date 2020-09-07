@@ -36,6 +36,7 @@ class PlayerTile extends StatelessWidget {
                   overflow: TextOverflow.visible,
                 ),
                 content: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(position),
                     Text(nationality),

@@ -7,6 +7,10 @@ import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/message_bubble.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -15,6 +19,17 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  bool micListening = false;
+  bool _hasSpeech = false;
+  double level = 0.0;
+  double minSoundLevel = 50000;
+  double maxSoundLevel = -50000;
+  String lastWords = "";
+  String lastError = "";
+  String lastStatus = "";
+  String _currentLocaleId = "";
+  final SpeechToText speech = SpeechToText();
+
   SocketIO socketIO;
   ScrollController scrollController;
   final messageController = TextEditingController();
@@ -62,6 +77,21 @@ class _ChatScreenState extends State<ChatScreen> {
     socketIO.connect();
   }
 
+  Future<void> initSpeechState() async {
+    bool hasSpeech = await speech.initialize(
+        onError: errorListener, onStatus: statusListener);
+    if (hasSpeech) {
+      var systemLocale = await speech.systemLocale();
+      _currentLocaleId = systemLocale.localeId;
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _hasSpeech = hasSpeech;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,10 +118,10 @@ class _ChatScreenState extends State<ChatScreen> {
             Expanded(
               child: Container(
                 child: ListView.builder(
+                    padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
                     reverse: true,
                     controller: scrollController,
                     physics: BouncingScrollPhysics(),
-                    padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
                     itemCount: messageWidgets.length,
                     itemBuilder: (context, index) => messageWidgets[index]),
               ),
@@ -109,7 +139,34 @@ class _ChatScreenState extends State<ChatScreen> {
                       onChanged: (value) {
                         messageText = value;
                       },
-                      decoration: kMessageTextFieldDecoration,
+                      decoration: kMessageTextFieldDecoration.copyWith(
+                        prefixIcon: GestureDetector(
+                          child: micListening
+                              ? Icon(Icons.mic_off)
+                              : Icon(Icons.mic),
+                          onTap: () {
+                            if (micListening) {
+                              setState(() {
+                                micListening = !micListening;
+                              });
+                              if (speech.isListening) {
+                                stopListening();
+                              }
+                            } else {
+                              requestPermission();
+                              setState(() {
+                                micListening = !micListening;
+                              });
+                              if (!(!_hasSpeech || speech.isListening)) {
+                                startListening();
+                              }
+                            }
+                          },
+                        ),
+                        hintText: micListening
+                            ? "Listening voice....."
+                            : 'Send message...',
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -161,5 +218,72 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  void startListening() {
+    lastWords = "";
+    lastError = "";
+    speech.listen(
+      onResult: resultListener,
+      listenFor: Duration(seconds: 10),
+      localeId: _currentLocaleId,
+      onSoundLevelChange: soundLevelListener,
+      cancelOnError: true,
+      partialResults: true,
+    );
+
+    setState(() {});
+  }
+
+  void stopListening() {
+    speech.stop();
+    setState(() {
+      level = 0.0;
+    });
+  }
+
+  void cancelListening() {
+    speech.cancel();
+    setState(() {
+      level = 0.0;
+    });
+  }
+
+  void resultListener(SpeechRecognitionResult result) {
+    setState(() {
+      lastWords = "${result.recognizedWords}";
+      setState(() {
+        messageController.text = lastWords;
+      });
+    });
+  }
+
+  void soundLevelListener(double level) {
+    minSoundLevel = math.min(minSoundLevel, level);
+    maxSoundLevel = math.max(maxSoundLevel, level);
+    setState(() {
+      this.level = level;
+    });
+  }
+
+  void errorListener(SpeechRecognitionError error) {
+    setState(() {
+      lastError = "${error.errorMsg} - ${error.permanent}";
+    });
+  }
+
+  void requestPermission() async {
+    await PermissionHandler().requestPermissions([PermissionGroup.camera]);
+  }
+
+  void statusListener(String status) {
+    setState(() {
+      lastStatus = "$status";
+      if ("$status" == "notListening") {
+        setState(() {
+          micListening = false;
+        });
+      }
+    });
   }
 }
