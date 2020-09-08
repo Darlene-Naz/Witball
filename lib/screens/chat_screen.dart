@@ -16,6 +16,17 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  bool micListening = false;
+  bool _hasSpeech = false;
+  double level = 0.0;
+  double minSoundLevel = 50000;
+  double maxSoundLevel = -50000;
+  String lastWords = "";
+  String lastError = "";
+  String lastStatus = "";
+  String _currentLocaleId = "";
+  final SpeechToText speech = SpeechToText();
+
   SocketIO socketIO;
   ScrollController scrollController;
   final messageController = TextEditingController();
@@ -73,6 +84,21 @@ class _ChatScreenState extends State<ChatScreen> {
     teamName = box.get('teamName');
     this.setState(() {
       this.loading = false;
+    });
+  }
+
+  Future<void> initSpeechState() async {
+    bool hasSpeech = await speech.initialize(
+        onError: errorListener, onStatus: statusListener);
+    if (hasSpeech) {
+      var systemLocale = await speech.systemLocale();
+      _currentLocaleId = systemLocale.localeId;
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _hasSpeech = hasSpeech;
     });
   }
 
@@ -181,5 +207,72 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
     );
+  }
+
+  void startListening() {
+    lastWords = "";
+    lastError = "";
+    speech.listen(
+      onResult: resultListener,
+      listenFor: Duration(seconds: 10),
+      localeId: _currentLocaleId,
+      onSoundLevelChange: soundLevelListener,
+      cancelOnError: true,
+      partialResults: true,
+    );
+
+    setState(() {});
+  }
+
+  void stopListening() {
+    speech.stop();
+    setState(() {
+      level = 0.0;
+    });
+  }
+
+  void cancelListening() {
+    speech.cancel();
+    setState(() {
+      level = 0.0;
+    });
+  }
+
+  void resultListener(SpeechRecognitionResult result) {
+    setState(() {
+      lastWords = "${result.recognizedWords}";
+      setState(() {
+        messageController.text = lastWords;
+      });
+    });
+  }
+
+  void soundLevelListener(double level) {
+    minSoundLevel = math.min(minSoundLevel, level);
+    maxSoundLevel = math.max(maxSoundLevel, level);
+    setState(() {
+      this.level = level;
+    });
+  }
+
+  void errorListener(SpeechRecognitionError error) {
+    setState(() {
+      lastError = "${error.errorMsg} - ${error.permanent}";
+    });
+  }
+
+  void requestPermission() async {
+    await PermissionHandler().requestPermissions([PermissionGroup.camera]);
+  }
+
+  void statusListener(String status) {
+    setState(() {
+      lastStatus = "$status";
+      if ("$status" == "notListening") {
+        setState(() {
+          micListening = false;
+        });
+      }
+    });
   }
 }

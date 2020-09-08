@@ -70,6 +70,7 @@ class FixtureTile extends StatelessWidget {
                   width: MediaQuery.of(context).size.width / 4,
                   child: Text(
                     formatter.format(DateTime.parse(datetimeOfMatch).toLocal()),
+                    textAlign: TextAlign.center,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

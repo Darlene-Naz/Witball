@@ -24,6 +24,7 @@ class ShowFixturesList extends StatelessWidget {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
+              padding: EdgeInsets.only(left: 4),
               itemBuilder: (context, index) => FixtureTile(
                 homeTeam: response['object'][index]['homeTeam'],
                 awayTeam: response['object'][index]['awayTeam'],
