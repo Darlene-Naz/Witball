@@ -18,6 +18,7 @@ class FooBallChat extends StatelessWidget {
         RegistrationScreen.id: (context) => RegistrationScreen(),
         ChatScreen.id: (context) => ChatScreen()
       },
+      debugShowCheckedModeBanner: false,
 //      darkTheme: ThemeData.light(),
     );
   }

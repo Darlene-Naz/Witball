@@ -7,10 +7,7 @@ import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/message_bubble.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:speech_to_text/speech_recognition_error.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
-import 'package:speech_to_text/speech_to_text.dart';
+import 'package:hive/hive.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -34,6 +31,9 @@ class _ChatScreenState extends State<ChatScreen> {
   ScrollController scrollController;
   final messageController = TextEditingController();
   String messageText;
+  var box;
+  bool loading = true;
+  String name, teamName;
   List<Widget> messageWidgets = List<Widget>();
 
   @override
@@ -76,6 +76,16 @@ class _ChatScreenState extends State<ChatScreen> {
     //Connect to the socket
     socketIO.connect();
     initSpeechState();
+    openBox();
+  }
+
+  Future<void> openBox() async {
+    box = await Hive.openBox('data');
+    name = box.get('name');
+    teamName = box.get('teamName');
+    this.setState(() {
+      this.loading = false;
+    });
   }
 
   Future<void> initSpeechState() async {
@@ -105,34 +115,21 @@ class _ChatScreenState extends State<ChatScreen> {
                 //Implement logout functionality
               }),
         ],
-        title: Text('FooBall Chat'),
+        title: Text('WitBall Chat'),
         backgroundColor: Colors.lightBlueAccent,
       ),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            // Column(
-            //   children: messageWidgets,
-            // ),
-            Expanded(
-              child: Container(
-                child: ListView.builder(
-                    padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
-                    reverse: true,
-                    controller: scrollController,
-                    physics: BouncingScrollPhysics(),
-                    itemCount: messageWidgets.length,
-                    itemBuilder: (context, index) => messageWidgets[index]),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 8.0, bottom: 8, right: 8, top: 4),
-              decoration: kMessageContainerDecoration,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+      body: this.loading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  // Column(
+                  //   children: messageWidgets,
+                  // ),
                   Expanded(
                     child: TextField(
                       maxLines: null,
@@ -181,51 +178,52 @@ class _ChatScreenState extends State<ChatScreen> {
                   SizedBox(
                     width: 8,
                   ),
-                  FloatingActionButton(
-                    onPressed: () {
-                      setState(() {
-                        //Send the message as JSON data to send_message event
-                        socketIO.sendMessage(
-                          'send_query',
-                          json.encode({'message': messageController.text}),
-                        );
-                        messageWidgets.insert(
-                          0,
-                          MessageBubble(
-                            sender: '@darlene',
-                            response: {
-                              'type': 'string',
-                              'message': messageController.text,
-                            },
-                            isMe: true,
+                 
+                        FloatingActionButton(
+                          onPressed: () {
+                            setState(() {
+                              //Send the message as JSON data to send_message event
+                              socketIO.sendMessage(
+                                'send_query',
+                                json.encode({'message': messageText}),
+                              );
+                              messageWidgets.insert(
+                                0,
+                                MessageBubble(
+                                  sender: '@d$name',
+                                  response: {
+                                    'type': 'string',
+                                    'message': messageText,
+                                  },
+                                  isMe: true,
+                                ),
+                              );
+                              messageController.clear();
+                              scrollController.animateTo(
+                                scrollController.position.maxScrollExtent,
+                                duration: Duration(milliseconds: 600),
+                                curve: Curves.ease,
+                              );
+                            });
+                          },
+                          child: Transform.rotate(
+                            angle: -math.pi / 6,
+                            child: Icon(
+                              Icons.send,
+                              size: 24,
+                            ),
                           ),
-                        );
-                        messageController.clear();
-                        scrollController.animateTo(
-                          scrollController.position.maxScrollExtent,
-                          duration: Duration(milliseconds: 600),
-                          curve: Curves.ease,
-                        );
-                      });
-                    },
-                    child: Transform.rotate(
-                      angle: -math.pi / 6,
-                      child: Icon(
-                        Icons.send,
-                        size: 24,
-                      ),
+                          // child: Text(
+                          //   'Send',
+                          //   style: kSendButtonTextStyle,
+                          // ),
+                        ),
+                      ],
                     ),
-                    // child: Text(
-                    //   'Send',
-                    //   style: kSendButtonTextStyle,
-                    // ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 

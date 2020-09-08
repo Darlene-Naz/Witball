@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:foo_bot/screens/login_screen.dart';
 import 'package:foo_bot/screens/registration_screen.dart';
 import 'package:foo_bot/widgets/rounded_button.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const String id = 'welcome_screen';
@@ -15,6 +17,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   AnimationController _controller;
   Animation _animation;
   String animationType;
+  bool loading = true;
+  var box;
 
   @override
   void initState() {
@@ -40,7 +44,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     _controller.addListener(() {
       setState(() {});
-      print(_animation.value);
+    });
+    openBox();
+  }
+
+  Future<void> openBox() async {
+    var dir = await getApplicationDocumentsDirectory();
+    Hive.init(dir.path);
+    box = await Hive.openBox('data');
+    this.setState(() {
+      loading = false;
     });
   }
 
@@ -53,57 +66,61 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: Image.asset('images/background.jpg')),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Align(
-                  alignment: AlignmentDirectional(0, 0.5),
-                  child: Transform.translate(
-                    offset: Offset(0, _animation.value * 50),
-                    child: Hero(
-                      tag: 'logo',
-                      child: Container(
-                        child: Image.asset('images/logo.png'),
-                        height: 60.0,
+                Row(
+                  children: <Widget>[
+                    Align(
+                      alignment: AlignmentDirectional(0, 2),
+                      child: Transform.translate(
+                        offset: Offset(0, _animation.value * 50),
+                        child: Hero(
+                          tag: 'logo',
+                          child: Container(
+                            child: Image.asset('images/logo.png'),
+                            height: 60.0,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    TyperAnimatedTextKit(
+                      text: ['WitBall Chat'],
+                      textStyle: TextStyle(
+                        fontSize: 40.0,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                      speed: Duration(milliseconds: 200),
+                    ),
+                  ],
                 ),
-                TypewriterAnimatedTextKit(
-                  text: ['FooBall Chat'],
-                  textStyle: TextStyle(
-                    fontSize: 40.0,
-                    fontWeight: FontWeight.w900,
-                  ),
-                  speed: Duration(milliseconds: 200),
+                SizedBox(
+                  height: 60.0,
                 ),
+                !this.loading
+                    ? RoundedButton(
+                        title: 'Go next',
+                        colour: Colors.lightBlueAccent,
+                        onPressed: () {
+                          Navigator.pushNamed(context, LoginScreen.id);
+                        },
+                      )
+                    : CircularProgressIndicator(),
               ],
             ),
-            SizedBox(
-              height: 48.0,
-            ),
-            RoundedButton(
-              title: 'Log In',
-              colour: Colors.lightBlueAccent,
-              onPressed: () {
-                Navigator.pushNamed(context, LoginScreen.id);
-              },
-            ),
-            RoundedButton(
-              title: 'Register',
-              colour: Colors.blueAccent,
-              onPressed: () {
-                Navigator.pushNamed(context, RegistrationScreen.id);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
