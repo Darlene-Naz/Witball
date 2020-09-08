@@ -30,14 +30,14 @@ class _ChatScreenState extends State<ChatScreen> {
   String lastStatus = "";
   String _currentLocaleId = "";
   final SpeechToText speech = SpeechToText();
-
+  var box;
+  bool loading = true;
+  Map<String, Color> colors = new Map();
+  String name, teamName;
   SocketIO socketIO;
   ScrollController scrollController;
   final messageController = TextEditingController();
   String messageText;
-  var box;
-  bool loading = true;
-  String name, teamName;
   List<Widget> messageWidgets = List<Widget>();
   Map<String, Color> colors = new Map();
 
@@ -109,6 +109,29 @@ class _ChatScreenState extends State<ChatScreen> {
     };
     //Connect to the socket
     socketIO.connect();
+    initSpeechState();
+    colors = {
+      'Arsenal': Colors.red,
+      'Aston Villa': Colors.pink[900],
+      'Brighton & Hove Albion': Colors.blue,
+      'Burnley': Colors.redAccent[700],
+      'Chelsea': Colors.blueAccent[200],
+      'Crystal Palace': Colors.blueAccent[700],
+      'Everton': Colors.blue,
+      'Fulham': Colors.black26,
+      'Leeds United': Colors.grey,
+      'Leicester City': Colors.blueAccent[700],
+      'Liverpool': Colors.red[900],
+      'Manchester City': Colors.lightBlueAccent[400],
+      'Manchester United': Colors.red[500],
+      'Newcastle United': Colors.grey,
+      'Sheffield United': Colors.red,
+      'Southampton': Colors.red,
+      'Tottenham Hotspur': Colors.indigo,
+      'West Bromwich Albion': Colors.indigo[800],
+      'West Ham United': Colors.pink[900],
+      'Wolverhampton Wanderers': Colors.amber[600]
+    };
     openBox();
   }
 
@@ -140,110 +163,132 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-//        leading: null,
-//        actions: <Widget>[
-//          IconButton(
-//              icon: Icon(Icons.close),
-//              onPressed: () {
-//                //Implement logout functionality
-//              }),
-//        ],
-        title: Text('WitBall Chat'),
-        backgroundColor: this.loading ? Colors.blueAccent : colors[teamName],
+        leading: null,
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                //Implement logout functionality
+              }),
+        ],
+        title: Text('FooBall Chat'),
+        backgroundColor: Colors.lightBlueAccent,
       ),
-      body: this.loading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            // Column(
+            //   children: messageWidgets,
+            // ),
+            Expanded(
+              child: Container(
+                child: ListView.builder(
+                    padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
+                    reverse: true,
+                    controller: scrollController,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: messageWidgets.length,
+                    itemBuilder: (context, index) => messageWidgets[index]),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 8.0, bottom: 8, right: 8, top: 4),
+              decoration: kMessageContainerDecoration,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Column(
-                  //   children: messageWidgets,
-                  // ),
                   Expanded(
-                    child: Container(
-                      child: ListView.builder(
-                          reverse: true,
-                          controller: scrollController,
-                          physics: BouncingScrollPhysics(),
-                          padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
-                          itemCount: messageWidgets.length,
-                          itemBuilder: (context, index) =>
-                              messageWidgets[index]),
+                    child: TextField(
+                      maxLines: null,
+                      enableInteractiveSelection: true,
+                      textCapitalization: TextCapitalization.sentences,
+                      controller: messageController,
+                      decoration: kMessageTextFieldDecoration.copyWith(
+                        prefixIcon: GestureDetector(
+                          child: micListening
+                              ? Icon(
+                                  Icons.mic_off,
+                                )
+                              : Icon(
+                                  Icons.mic,
+                                  color: Colors.grey,
+                                ),
+                          onTap: () {
+                            if (micListening) {
+                              setState(() {
+                                micListening = !micListening;
+                              });
+                              if (speech.isListening) {
+                                stopListening();
+                              }
+                            } else {
+                              requestPermission();
+
+                              setState(() {
+                                micListening = !micListening;
+                              });
+                              if (!(!_hasSpeech || speech.isListening)) {
+                                startListening();
+                              }
+                            }
+                          },
+                        ),
+                        hintText: micListening
+                            ? "Listening voice....."
+                            : 'Type your message here...',
+                      ),
                     ),
                   ),
-                  Container(
-                    padding:
-                        EdgeInsets.only(left: 8.0, bottom: 8, right: 8, top: 4),
-                    decoration: kMessageContainerDecoration,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          child: TextField(
-                            textCapitalization: TextCapitalization.sentences,
-                            controller: messageController,
-                            onChanged: (value) {
-                              messageText = value;
+                  SizedBox(
+                    width: 8,
+                  ),
+                  FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        //Send the message as JSON data to send_message event
+                        socketIO.sendMessage(
+                          'send_query',
+                          json.encode({'message': messageController.text}),
+                        );
+                        messageWidgets.insert(
+                          0,
+                          MessageBubble(
+                            sender: '@$name',
+                            response: {
+                              'type': 'string',
+                              'message': messageController.text,
                             },
-                            decoration: kMessageTextFieldDecoration,
+                            isMe: true,
                           ),
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        FloatingActionButton(
-                          backgroundColor: this.loading
-                              ? Colors.blueAccent
-                              : colors[teamName],
-                          onPressed: () {
-                            setState(() {
-                              //Send the message as JSON data to send_message event
-                              socketIO.sendMessage(
-                                'send_query',
-                                json.encode({'message': messageText}),
-                              );
-                              messageWidgets.insert(
-                                0,
-                                MessageBubble(
-                                  sender: '@$name',
-                                  response: {
-                                    'type': 'string',
-                                    'message': messageText,
-                                  },
-                                  isMe: true,
-                                  color: colors[teamName],
-                                ),
-                              );
-                              messageController.clear();
-                              scrollController.animateTo(
-                                scrollController.position.maxScrollExtent,
-                                duration: Duration(milliseconds: 600),
-                                curve: Curves.ease,
-                              );
-                            });
-                          },
-                          child: Transform.rotate(
-                            angle: -math.pi / 6,
-                            child: Icon(
-                              Icons.send,
-                              size: 24,
-                            ),
-                          ),
-                          // child: Text(
-                          //   'Send',
-                          //   style: kSendButtonTextStyle,
-                          // ),
-                        ),
-                      ],
+                        );
+                        messageController.clear();
+                        scrollController.animateTo(
+                          scrollController.position.maxScrollExtent,
+                          duration: Duration(milliseconds: 600),
+                          curve: Curves.ease,
+                        );
+                      });
+                    },
+                    child: Transform.rotate(
+                      angle: -math.pi / 6,
+                      child: Icon(
+                        Icons.send,
+                        size: 24,
+                      ),
                     ),
+                    // child: Text(
+                    //   'Send',
+                    //   style: kSendButtonTextStyle,
+                    // ),
                   ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -252,65 +297,53 @@ class _ChatScreenState extends State<ChatScreen> {
     lastError = "";
     speech.listen(
       onResult: resultListener,
-      listenFor: Duration(seconds: 10),
+      listenFor: Duration(seconds: 20),
       localeId: _currentLocaleId,
       onSoundLevelChange: soundLevelListener,
       cancelOnError: true,
       partialResults: true,
     );
-
-    setState(() {});
   }
 
   void stopListening() {
     speech.stop();
-    setState(() {
-      level = 0.0;
-    });
+    level = 0.0;
   }
 
   void cancelListening() {
     speech.cancel();
-    setState(() {
-      level = 0.0;
-    });
+
+    level = 0.0;
   }
 
   void resultListener(SpeechRecognitionResult result) {
-    setState(() {
-      lastWords = "${result.recognizedWords}";
-      setState(() {
-        messageController.text = lastWords;
-      });
-    });
+    lastWords = "${result.recognizedWords}";
+    messageController.text = lastWords;
+    messageController.selection = TextSelection.fromPosition(
+      TextPosition(offset: messageController.text.length),
+    );
+    print(lastWords + "   ...these were the last words i heard");
   }
 
   void soundLevelListener(double level) {
     minSoundLevel = math.min(minSoundLevel, level);
     maxSoundLevel = math.max(maxSoundLevel, level);
-    setState(() {
-      this.level = level;
-    });
+
+    level = level;
   }
 
   void errorListener(SpeechRecognitionError error) {
-    setState(() {
-      lastError = "${error.errorMsg} - ${error.permanent}";
-    });
+    lastError = "${error.errorMsg} - ${error.permanent}";
   }
 
   void requestPermission() async {
-    await PermissionHandler().requestPermissions([PermissionGroup.camera]);
+    await PermissionHandler().requestPermissions([PermissionGroup.microphone]);
   }
 
   void statusListener(String status) {
-    setState(() {
-      lastStatus = "$status";
-      if ("$status" == "notListening") {
-        setState(() {
-          micListening = false;
-        });
-      }
-    });
+    lastStatus = "$status";
+    if ("$status" == "notListening") {
+      micListening = false;
+    }
   }
 }

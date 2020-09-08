@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:foo_bot/screens/chat_screen.dart';
 import 'package:foo_bot/screens/login_screen.dart';
-import 'package:foo_bot/screens/registration_screen.dart';
-import 'package:foo_bot/widgets/rounded_button.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -46,6 +47,19 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       setState(() {});
     });
     openBox();
+    startTime();
+  }
+
+  startTime() async {
+    var _duration = new Duration(seconds: 10);
+    return new Timer(_duration, navigationPage);
+  }
+
+  void navigationPage() {
+    if (box.get('name').toString() != null)
+      Navigator.pushReplacementNamed(context, ChatScreen.id);
+    else
+      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
   }
 
   Future<void> openBox() async {
@@ -95,7 +109,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       ),
                     ),
                     TyperAnimatedTextKit(
-                      text: ['WitBall Chat'],
+                      text: ['WitBall Chat _'],
                       textStyle: TextStyle(
                         fontSize: 40.0,
                         fontWeight: FontWeight.w900,
@@ -108,15 +122,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 SizedBox(
                   height: 60.0,
                 ),
-                !this.loading
-                    ? RoundedButton(
-                        title: 'Go next',
-                        colour: Colors.lightBlueAccent,
-                        onPressed: () {
-                          Navigator.pushNamed(context, LoginScreen.id);
-                        },
-                      )
-                    : CircularProgressIndicator(),
+                !this.loading ? Container() : CircularProgressIndicator(),
               ],
             ),
           ),
