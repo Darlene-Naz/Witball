@@ -8,6 +8,10 @@ import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/message_bubble.dart';
 import 'package:hive/hive.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -178,48 +182,45 @@ class _ChatScreenState extends State<ChatScreen> {
                   SizedBox(
                     width: 8,
                   ),
-                 
-                        FloatingActionButton(
-                          onPressed: () {
-                            setState(() {
-                              //Send the message as JSON data to send_message event
-                              socketIO.sendMessage(
-                                'send_query',
-                                json.encode({'message': messageText}),
-                              );
-                              messageWidgets.insert(
-                                0,
-                                MessageBubble(
-                                  sender: '@d$name',
-                                  response: {
-                                    'type': 'string',
-                                    'message': messageText,
-                                  },
-                                  isMe: true,
-                                ),
-                              );
-                              messageController.clear();
-                              scrollController.animateTo(
-                                scrollController.position.maxScrollExtent,
-                                duration: Duration(milliseconds: 600),
-                                curve: Curves.ease,
-                              );
-                            });
-                          },
-                          child: Transform.rotate(
-                            angle: -math.pi / 6,
-                            child: Icon(
-                              Icons.send,
-                              size: 24,
-                            ),
+
+                  FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        //Send the message as JSON data to send_message event
+                        socketIO.sendMessage(
+                          'send_query',
+                          json.encode({'message': messageText}),
+                        );
+                        messageWidgets.insert(
+                          0,
+                          MessageBubble(
+                            sender: '@d$name',
+                            response: {
+                              'type': 'string',
+                              'message': messageText,
+                            },
+                            isMe: true,
                           ),
-                          // child: Text(
-                          //   'Send',
-                          //   style: kSendButtonTextStyle,
-                          // ),
-                        ),
-                      ],
+                        );
+                        messageController.clear();
+                        scrollController.animateTo(
+                          scrollController.position.maxScrollExtent,
+                          duration: Duration(milliseconds: 600),
+                          curve: Curves.ease,
+                        );
+                      });
+                    },
+                    child: Transform.rotate(
+                      angle: -math.pi / 6,
+                      child: Icon(
+                        Icons.send,
+                        size: 24,
+                      ),
                     ),
+                    // child: Text(
+                    //   'Send',
+                    //   style: kSendButtonTextStyle,
+                    // ),
                   ),
                 ],
               ),
