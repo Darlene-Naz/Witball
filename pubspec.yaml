@@ -18,6 +18,8 @@ dependencies:
   flutter_socket_io:
   flutter_svg:
   intl:
+  hive:
+  path_provider:
 
 dev_dependencies:
   flutter_test:
