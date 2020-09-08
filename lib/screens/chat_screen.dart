@@ -8,6 +8,10 @@ import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/message_bubble.dart';
 import 'package:hive/hive.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -35,6 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool loading = true;
   String name, teamName;
   List<Widget> messageWidgets = List<Widget>();
+  Map<String, Color> colors = new Map();
 
   @override
   void dispose() {
@@ -60,11 +65,17 @@ class _ChatScreenState extends State<ChatScreen> {
       //Convert the JSON data received into a Map
 
       Map<String, dynamic> data = json.decode(jsonData);
+      print('hey');
       print(data);
       this.setState(
         () => messageWidgets.insert(
           0,
-          MessageBubble(sender: '@foobot', response: data, isMe: false),
+          MessageBubble(
+            sender: '@witball',
+            response: data,
+            isMe: false,
+            color: Colors.white,
+          ),
         ),
       );
       scrollController.animateTo(
@@ -73,6 +84,29 @@ class _ChatScreenState extends State<ChatScreen> {
         curve: Curves.ease,
       );
     });
+
+    colors = {
+      'Arsenal': Colors.red,
+      'Aston Villa': Colors.pink[900],
+      'Brighton & Hove Albion': Colors.blue,
+      'Burnley': Colors.redAccent[700],
+      'Chelsea': Colors.blueAccent[200],
+      'Crystal Palace': Colors.blueAccent[700],
+      'Everton': Colors.blue,
+      'Fulham': Colors.black26,
+      'Leeds United': Colors.grey,
+      'Leicester City': Colors.blueAccent[700],
+      'Liverpool': Colors.red[900],
+      'Manchester City': Colors.lightBlueAccent[400],
+      'Manchester United': Colors.red[500],
+      'Newcastle United': Colors.grey,
+      'Sheffield United': Colors.red,
+      'Southampton': Colors.red,
+      'Tottenham Hotspur': Colors.indigo,
+      'West Bromwich Albion': Colors.indigo[800],
+      'West Ham United': Colors.pink[900],
+      'Wolverhampton Wanderers': Colors.amber[600]
+    };
     //Connect to the socket
     socketIO.connect();
     openBox();
@@ -106,16 +140,16 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: null,
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                //Implement logout functionality
-              }),
-        ],
+//        leading: null,
+//        actions: <Widget>[
+//          IconButton(
+//              icon: Icon(Icons.close),
+//              onPressed: () {
+//                //Implement logout functionality
+//              }),
+//        ],
         title: Text('WitBall Chat'),
-        backgroundColor: Colors.lightBlueAccent,
+        backgroundColor: this.loading ? Colors.blueAccent : colors[teamName],
       ),
       body: this.loading
           ? Center(
@@ -162,6 +196,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           width: 8,
                         ),
                         FloatingActionButton(
+                          backgroundColor: this.loading
+                              ? Colors.blueAccent
+                              : colors[teamName],
                           onPressed: () {
                             setState(() {
                               //Send the message as JSON data to send_message event
@@ -172,12 +209,13 @@ class _ChatScreenState extends State<ChatScreen> {
                               messageWidgets.insert(
                                 0,
                                 MessageBubble(
-                                  sender: '@d$name',
+                                  sender: '@$name',
                                   response: {
                                     'type': 'string',
                                     'message': messageText,
                                   },
                                   isMe: true,
+                                  color: colors[teamName],
                                 ),
                               );
                               messageController.clear();

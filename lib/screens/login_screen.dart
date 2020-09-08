@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> openBox() async {
     box = await Hive.openBox('data');
     if (box.get('name').toString() != null) {
-      Navigator.pushReplacementNamed(context, ChatScreen.id);
+//      Navigator.pushReplacementNamed(context, ChatScreen.id);
     }
   }
 
@@ -64,12 +64,38 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 8.0,
                 ),
-                TextField(
-                  onChanged: (value) {
-                    box.put('teamName', value);
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                      hintText: 'Enter your fav team name'),
+                new DropdownButton<String>(
+                  items: <String>[
+                    'Arsenal',
+                    'Aston Villa',
+                    'Brighton & Hove Albion',
+                    'Burnley',
+                    'Chelsea',
+                    'Crystal Palace',
+                    'Everton',
+                    'Fulham',
+                    'Leeds United',
+                    'Leicester City',
+                    'Liverpool',
+                    'Manchester City',
+                    'Manchester United',
+                    'Newcastle United',
+                    'Sheffield United',
+                    'Southampton',
+                    'Tottenham Hotspur',
+                    'West Bromwich Albion',
+                    'West Ham United',
+                    'Wolverhampton Wanderers'
+                  ].map((String value) {
+                    return new DropdownMenuItem<String>(
+                      value: value,
+                      child: new Text(value),
+                      onTap: () {
+                        box.put('teamName', value);
+                      },
+                    );
+                  }).toList(),
+                  onChanged: (_) {},
                 ),
                 SizedBox(
                   height: 24.0,
