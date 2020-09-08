@@ -75,6 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     //Connect to the socket
     socketIO.connect();
+    initSpeechState();
   }
 
   Future<void> initSpeechState() async {
@@ -134,6 +135,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      maxLines: null,
+                      enableInteractiveSelection: true,
                       textCapitalization: TextCapitalization.sentences,
                       controller: messageController,
                       onChanged: (value) {
@@ -142,8 +145,13 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: kMessageTextFieldDecoration.copyWith(
                         prefixIcon: GestureDetector(
                           child: micListening
-                              ? Icon(Icons.mic_off)
-                              : Icon(Icons.mic),
+                              ? Icon(
+                                  Icons.mic_off,
+                                )
+                              : Icon(
+                                  Icons.mic,
+                                  color: Colors.grey,
+                                ),
                           onTap: () {
                             if (micListening) {
                               setState(() {
@@ -154,6 +162,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               }
                             } else {
                               requestPermission();
+
                               setState(() {
                                 micListening = !micListening;
                               });
@@ -178,7 +187,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         //Send the message as JSON data to send_message event
                         socketIO.sendMessage(
                           'send_query',
-                          json.encode({'message': messageText}),
+                          json.encode({'message': messageController.text}),
                         );
                         messageWidgets.insert(
                           0,
@@ -186,7 +195,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             sender: '@darlene',
                             response: {
                               'type': 'string',
-                              'message': messageText,
+                              'message': messageController.text,
                             },
                             isMe: true,
                           ),
@@ -225,65 +234,53 @@ class _ChatScreenState extends State<ChatScreen> {
     lastError = "";
     speech.listen(
       onResult: resultListener,
-      listenFor: Duration(seconds: 10),
+      listenFor: Duration(seconds: 20),
       localeId: _currentLocaleId,
       onSoundLevelChange: soundLevelListener,
       cancelOnError: true,
       partialResults: true,
     );
-
-    setState(() {});
   }
 
   void stopListening() {
     speech.stop();
-    setState(() {
-      level = 0.0;
-    });
+    level = 0.0;
   }
 
   void cancelListening() {
     speech.cancel();
-    setState(() {
-      level = 0.0;
-    });
+
+    level = 0.0;
   }
 
   void resultListener(SpeechRecognitionResult result) {
-    setState(() {
-      lastWords = "${result.recognizedWords}";
-      setState(() {
-        messageController.text = lastWords;
-      });
-    });
+    lastWords = "${result.recognizedWords}";
+    messageController.text = lastWords;
+    messageController.selection = TextSelection.fromPosition(
+      TextPosition(offset: messageController.text.length),
+    );
+    print(lastWords + "   ...these were the last words i heard");
   }
 
   void soundLevelListener(double level) {
     minSoundLevel = math.min(minSoundLevel, level);
     maxSoundLevel = math.max(maxSoundLevel, level);
-    setState(() {
-      this.level = level;
-    });
+
+    level = level;
   }
 
   void errorListener(SpeechRecognitionError error) {
-    setState(() {
-      lastError = "${error.errorMsg} - ${error.permanent}";
-    });
+    lastError = "${error.errorMsg} - ${error.permanent}";
   }
 
   void requestPermission() async {
-    await PermissionHandler().requestPermissions([PermissionGroup.camera]);
+    await PermissionHandler().requestPermissions([PermissionGroup.microphone]);
   }
 
   void statusListener(String status) {
-    setState(() {
-      lastStatus = "$status";
-      if ("$status" == "notListening") {
-        setState(() {
-          micListening = false;
-        });
-      }
-    });
+    lastStatus = "$status";
+    if ("$status" == "notListening") {
+      micListening = false;
+    }
   }
 }
