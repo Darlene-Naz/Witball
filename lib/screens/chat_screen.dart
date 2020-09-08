@@ -165,7 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         hintText: micListening
                             ? "Listening voice....."
-                            : 'Send message...',
+                            : 'Type your message here...',
                       ),
                     ),
                   ),
