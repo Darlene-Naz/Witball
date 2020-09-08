@@ -205,7 +205,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         messageWidgets.insert(
                           0,
                           MessageBubble(
-                            sender: '@darlene',
+                            sender: '@$name',
                             response: {
                               'type': 'string',
                               'message': messageController.text,
