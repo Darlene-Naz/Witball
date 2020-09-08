@@ -30,14 +30,13 @@ class _ChatScreenState extends State<ChatScreen> {
   String lastStatus = "";
   String _currentLocaleId = "";
   final SpeechToText speech = SpeechToText();
-
+  var box;
+  bool loading = true;
+  String name, teamName;
   SocketIO socketIO;
   ScrollController scrollController;
   final messageController = TextEditingController();
   String messageText;
-  var box;
-  bool loading = true;
-  String name, teamName;
   List<Widget> messageWidgets = List<Widget>();
 
   @override
@@ -119,21 +118,34 @@ class _ChatScreenState extends State<ChatScreen> {
                 //Implement logout functionality
               }),
         ],
-        title: Text('WitBall Chat'),
+        title: Text('FooBall Chat'),
         backgroundColor: Colors.lightBlueAccent,
       ),
-      body: this.loading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            // Column(
+            //   children: messageWidgets,
+            // ),
+            Expanded(
+              child: Container(
+                child: ListView.builder(
+                    padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
+                    reverse: true,
+                    controller: scrollController,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: messageWidgets.length,
+                    itemBuilder: (context, index) => messageWidgets[index]),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 8.0, bottom: 8, right: 8, top: 4),
+              decoration: kMessageContainerDecoration,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Column(
-                  //   children: messageWidgets,
-                  // ),
                   Expanded(
                     child: TextField(
                       maxLines: null,
@@ -182,22 +194,21 @@ class _ChatScreenState extends State<ChatScreen> {
                   SizedBox(
                     width: 8,
                   ),
-
                   FloatingActionButton(
                     onPressed: () {
                       setState(() {
                         //Send the message as JSON data to send_message event
                         socketIO.sendMessage(
                           'send_query',
-                          json.encode({'message': messageText}),
+                          json.encode({'message': messageController.text}),
                         );
                         messageWidgets.insert(
                           0,
                           MessageBubble(
-                            sender: '@d$name',
+                            sender: '@darlene',
                             response: {
                               'type': 'string',
-                              'message': messageText,
+                              'message': messageController.text,
                             },
                             isMe: true,
                           ),
@@ -225,6 +236,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 
