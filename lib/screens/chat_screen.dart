@@ -39,7 +39,6 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController messageController;
   String messageText;
   List<Widget> messageWidgets = List<Widget>();
-  Map<String, Color> colors = new Map();
 
   @override
   void dispose() {
@@ -87,28 +86,6 @@ class _ChatScreenState extends State<ChatScreen> {
       );
     });
 
-    colors = {
-      'Arsenal': Colors.red,
-      'Aston Villa': Colors.pink[900],
-      'Brighton & Hove Albion': Colors.blue,
-      'Burnley': Colors.redAccent[700],
-      'Chelsea': Colors.blueAccent[200],
-      'Crystal Palace': Colors.blueAccent[700],
-      'Everton': Colors.blue,
-      'Fulham': Colors.black26,
-      'Leeds United': Colors.grey,
-      'Leicester City': Colors.blueAccent[700],
-      'Liverpool': Colors.red[900],
-      'Manchester City': Colors.lightBlueAccent[400],
-      'Manchester United': Colors.red[500],
-      'Newcastle United': Colors.grey,
-      'Sheffield United': Colors.red,
-      'Southampton': Colors.red,
-      'Tottenham Hotspur': Colors.indigo,
-      'West Bromwich Albion': Colors.indigo[800],
-      'West Ham United': Colors.pink[900],
-      'Wolverhampton Wanderers': Colors.amber[600]
-    };
     //Connect to the socket
     socketIO.connect();
     initSpeechState();

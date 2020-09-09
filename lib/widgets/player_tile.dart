@@ -176,7 +176,7 @@ class PlayerTile extends StatelessWidget {
                   FlatButton(
                     child: Text("Close"),
                     onPressed: () => Navigator.pop(context),
-                  )
+                  ),
                 ],
               );
             },
