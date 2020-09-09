@@ -29,9 +29,12 @@ Training the Wit.AI to detect team names and different other intents was challen
 <ul>
 <li>Witball is currently in its adolescence. There are many leagues current in the world of Soccer. We have focused just on one i.e the English Premier League. We intend to focus on more leagues such as Bundesliga(Germany), La Liga(Spain), MLS(USA), etc.</li><li> We also would try to increase the amount of intents so that user can request for additional information.</li></ul>
 
+## Server
+Check out the backend server code <a href="https://github.com/sherwyn11/Witball-Server">here</a>.
+
 ## Contributors
 
-Made with 💙 by <a href="https://github.com/Darlene-Naz">Darlene Nazareth</a> and <a href="https://github.com/sherwyn11">Sherwyn D'souza</a></b>
+Made with 💙 by <a href="https://github.com/Darlene-Naz">Darlene Nazareth</a> and <a href="https://github.com/sherwyn11">Sherwyn D'souza</a></b>.
 
 ## License
 
