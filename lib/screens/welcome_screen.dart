@@ -56,10 +56,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   void navigationPage() {
-    if (box.get('name').toString() != null)
+    if (box.get('name') != null) {
+      _controller.dispose();
       Navigator.pushReplacementNamed(context, ChatScreen.id);
-    else
-      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
+    } else {
+      _controller.dispose();
+      Navigator.pushReplacementNamed(context, LoginScreen.id);
+    }
   }
 
   Future<void> openBox() async {

@@ -13,6 +13,28 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   var box;
+  Map<String, Color> colors = {
+    'Arsenal': Colors.red,
+    'Aston Villa': Colors.pink[900],
+    'Brighton & Hove Albion': Colors.blue,
+    'Burnley': Colors.redAccent[700],
+    'Chelsea': Colors.blueAccent[200],
+    'Crystal Palace': Colors.blueAccent[700],
+    'Everton': Colors.blue,
+    'Fulham': Colors.black26,
+    'Leeds United': Colors.grey,
+    'Leicester City': Colors.blueAccent[700],
+    'Liverpool': Colors.red[900],
+    'Manchester City': Colors.lightBlueAccent[400],
+    'Manchester United': Colors.red[500],
+    'Newcastle United': Colors.grey,
+    'Sheffield United': Colors.red,
+    'Southampton': Colors.red,
+    'Tottenham Hotspur': Colors.indigo,
+    'West Bromwich Albion': Colors.indigo[800],
+    'West Ham United': Colors.pink[900],
+    'Wolverhampton Wanderers': Colors.amber[600]
+  };
 
   @override
   void initState() {
@@ -87,12 +109,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: new Text(value),
                     onTap: () {
                       box.put('teamName', value);
+                      box.put('color', colors[value]);
                     },
                   );
                 }).toList(),
                 onChanged: (_) {},
                 hint: Text(
-                  "Please select the number!",
+                  "Please select a team!",
                 ),
               ),
               SizedBox(
