@@ -38,6 +38,3 @@ Made with 💙 by <a href="https://github.com/Darlene-Naz">Darlene Nazareth</a> 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [MIT License Link](https://github.com/Darlene-Naz/Witball/blob/master/LICENSE)
-
-© 2020 Copyright
-
