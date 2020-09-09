@@ -6,6 +6,8 @@ For football geeks like us, getting information about soccer matches like fixtur
 ## What it does
 Presenting <b>Witball</b>! A <b>Wit.AI</b> powered <b>Flutter Application</b> that gets data about latest fixtures, current score and also gets the players of your favourite team or any other team you name. Using Witball users can communicate with the Wit.AI bot using a chat interface.
 
+![](demo.gif)
+
 ## How we built it
 <ul><li>The application is built using Flutter. Flutter is a hybrid app development framework which can create apps for both Android and iOS at the same time!</li><li> The application is connected to our Server using sockets and messages are streamed to & from the application to the server. </li><li>The server then gets each message and detects the Wit.AI bot detects the intent from the text.</li><li> Based on the intent an appropriate message is then sent back to the user.</li></ul>
 
