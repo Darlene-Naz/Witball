@@ -55,14 +55,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 //    return new Timer(_duration, navigationPage);
 //  }
 
-//  void navigationPage() {
-//    if (box.get('name').toString() != null) {
-//      Navigator.pushReplacementNamed(context, ChatScreen.id);
-//    } else {
-//      print('here');
-//      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
-//    }
-//  }
+  void navigationPage() {
+    if (box.get('name') != null) {
+      _controller.dispose();
+      Navigator.pushReplacementNamed(context, ChatScreen.id);
+    } else {
+      _controller.dispose();
+      Navigator.pushReplacementNamed(context, LoginScreen.id);
+    }
+  }
 
   Future<void> openBox() async {
     var dir = await getApplicationDocumentsDirectory();

@@ -29,14 +29,14 @@ class _ChatScreenState extends State<ChatScreen> {
   String lastError = "";
   String lastStatus = "";
   String _currentLocaleId = "";
-  final SpeechToText speech = SpeechToText();
+  SpeechToText speech;
   var box;
   bool loading = true;
   Map<String, Color> colors = new Map();
   String name, teamName;
   SocketIO socketIO;
   ScrollController scrollController;
-  final messageController = TextEditingController();
+  TextEditingController messageController;
   String messageText;
   List<Widget> messageWidgets = List<Widget>();
 
@@ -49,6 +49,8 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    speech = SpeechToText();
+    messageController = TextEditingController();
     scrollController = ScrollController();
     //Creating the socket
     socketIO = SocketIOManager().createSocketIO(
@@ -139,7 +141,20 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: null,
+        leading: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Card(
+            elevation: 4,
+            shape: CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: Hero(
+              tag: 'logo',
+              child: ClipOval(
+                child: Image.asset('images/logo.png'),
+              ),
+            ),
+          ),
+        ),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.close),
@@ -178,17 +193,17 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       maxLines: null,
-                      enableInteractiveSelection: true,
                       textCapitalization: TextCapitalization.sentences,
                       controller: messageController,
+                      keyboardType: micListening ? null : TextInputType.text,
                       decoration: kMessageTextFieldDecoration.copyWith(
                         prefixIcon: GestureDetector(
                           child: micListening
                               ? Icon(
-                                  Icons.mic_off,
+                                  Icons.mic,
                                 )
                               : Icon(
-                                  Icons.mic,
+                                  Icons.mic_off,
                                   color: Colors.grey,
                                 ),
                           onTap: () {
@@ -221,6 +236,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     width: 8,
                   ),
                   FloatingActionButton(
+                    backgroundColor: colors[teamName],
                     onPressed: () {
                       setState(() {
                         //Send the message as JSON data to send_message event
@@ -237,6 +253,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               'message': messageController.text,
                             },
                             isMe: true,
+                            color: colors[teamName],
                           ),
                         );
                         messageController.clear();
@@ -319,7 +336,13 @@ class _ChatScreenState extends State<ChatScreen> {
   void statusListener(String status) {
     lastStatus = "$status";
     if ("$status" == "notListening") {
-      micListening = false;
+      setState(() {
+        micListening = false;
+        messageController.text = lastWords;
+        messageController.selection = TextSelection.fromPosition(
+          TextPosition(offset: messageController.text.length),
+        );
+      });
     }
   }
 }
