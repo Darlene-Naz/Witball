@@ -47,25 +47,35 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       setState(() {});
     });
     openBox();
-    startTime();
+//    startTime();
   }
 
-  startTime() async {
-    var _duration = new Duration(seconds: 10);
-    return new Timer(_duration, navigationPage);
-  }
+//  startTime() async {
+//    var _duration = new Duration(seconds: 10);
+//    return new Timer(_duration, navigationPage);
+//  }
 
-  void navigationPage() {
-    if (box.get('name').toString() != null)
-      Navigator.pushReplacementNamed(context, ChatScreen.id);
-    else
-      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
-  }
+//  void navigationPage() {
+//    if (box.get('name').toString() != null) {
+//      Navigator.pushReplacementNamed(context, ChatScreen.id);
+//    } else {
+//      print('here');
+//      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
+//    }
+//  }
 
   Future<void> openBox() async {
     var dir = await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
     box = await Hive.openBox('data');
+    print(box.get('name'));
+    box.put('name', null);
+    if (box.get('name') != null) {
+//      Navigator.pushReplacementNamed(context, ChatScreen.id);
+    } else {
+      print('login');
+      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
+    }
     this.setState(() {
       loading = false;
     });
@@ -109,7 +119,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       ),
                     ),
                     TyperAnimatedTextKit(
-                      text: ['WitBall Chat _'],
+                      text: ['WitBall_'],
                       textStyle: TextStyle(
                         fontSize: 40.0,
                         fontWeight: FontWeight.w900,
