@@ -164,7 +164,7 @@ class _ChatScreenState extends State<ChatScreen> {
               }),
         ],
         title: Text('FooBall Chat'),
-        backgroundColor: Colors.lightBlueAccent,
+        backgroundColor: colors[teamName],
       ),
       body: SafeArea(
         child: Column(
