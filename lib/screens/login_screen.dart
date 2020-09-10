@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/rounded_button.dart';
@@ -35,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
     'West Ham United': Colors.pink[900],
     'Wolverhampton Wanderers': Colors.amber[600]
   };
+  String _selectedTeam = "Select your team";
 
   @override
   void initState() {
@@ -81,41 +83,53 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 8.0,
               ),
-              new DropdownButton<String>(
-                items: <String>[
-                  'Arsenal',
-                  'Aston Villa',
-                  'Brighton & Hove Albion',
-                  'Burnley',
-                  'Chelsea',
-                  'Crystal Palace',
-                  'Everton',
-                  'Fulham',
-                  'Leeds United',
-                  'Leicester City',
-                  'Liverpool',
-                  'Manchester City',
-                  'Manchester United',
-                  'Newcastle United',
-                  'Sheffield United',
-                  'Southampton',
-                  'Tottenham Hotspur',
-                  'West Bromwich Albion',
-                  'West Ham United',
-                  'Wolverhampton Wanderers'
-                ].map((String value) {
-                  return new DropdownMenuItem<String>(
-                    value: value,
-                    child: new Text(value),
-                    onTap: () {
-                      box.put('teamName', value);
-                      box.put('color', colors[value]);
-                    },
-                  );
-                }).toList(),
-                onChanged: (_) {},
-                hint: Text(
-                  "Please select a team!",
+              Container(
+                padding: EdgeInsets.only(left: 16, right: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blueAccent),
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  underline: Container(),
+                  items: <String>[
+                    'Arsenal',
+                    'Aston Villa',
+                    'Brighton & Hove Albion',
+                    'Burnley',
+                    'Chelsea',
+                    'Crystal Palace',
+                    'Everton',
+                    'Fulham',
+                    'Leeds United',
+                    'Leicester City',
+                    'Liverpool',
+                    'Manchester City',
+                    'Manchester United',
+                    'Newcastle United',
+                    'Sheffield United',
+                    'Southampton',
+                    'Tottenham Hotspur',
+                    'West Bromwich Albion',
+                    'West Ham United',
+                    'Wolverhampton Wanderers'
+                  ].map((String value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: new Text(value),
+                      onTap: () {
+                        box.put('teamName', value);
+                        box.put('color', colors[value]);
+                        setState(() {
+                          _selectedTeam = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                  onChanged: (_) {},
+                  hint: Text(
+                    "$_selectedTeam",
+                  ),
                 ),
               ),
               SizedBox(

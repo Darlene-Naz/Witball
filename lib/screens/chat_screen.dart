@@ -162,8 +162,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 //Implement logout functionality
               }),
         ],
-        title: Text('Witball'),
-        backgroundColor: Colors.lightBlueAccent,
+        title: Text('FooBall Chat'),
+        backgroundColor: colors[teamName],
       ),
       body: SafeArea(
         child: Column(
