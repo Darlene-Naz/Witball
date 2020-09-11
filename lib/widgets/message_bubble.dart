@@ -21,10 +21,14 @@ class MessageBubble extends StatelessWidget {
               children: <Widget>[
                 Text(
                   sender,
+                  softWrap: true,
                   style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.black54,
-                  ),
+                      fontSize: 12.0,
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic),
+                ),
+                SizedBox(
+                  height: 1,
                 ),
                 Material(
                   borderRadius: isMe
@@ -39,7 +43,7 @@ class MessageBubble extends StatelessWidget {
                         ),
                   elevation: 5.0,
                   color: isMe ? color : Colors.white,
-                  child: Padding(
+                  child: Container(
                     padding:
                         EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                     child: Text(
@@ -58,8 +62,18 @@ class MessageBubble extends StatelessWidget {
             ? ShowPlayersList(
                 response: response,
               )
-            : ShowFixturesList(
-                response: response,
-              );
+            : response['intent'] == 'get_fixtures'
+                ? ShowFixturesList(
+                    response: response,
+                  )
+                : MessageBubble(
+                    sender: '@witbot',
+                    response: {
+                      'type': 'string',
+                      'message':
+                          'Oops! Some error may have occurred while fetching ${response['teamName']}\'s score'
+                    },
+                    isMe: false,
+                  );
   }
 }

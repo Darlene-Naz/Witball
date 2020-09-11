@@ -5,13 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
-import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/message_bubble.dart';
 import 'package:hive/hive.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+
+import 'file:///C:/Users/Darlene/AndroidStudioProjects/FlutterProjects/foo_bot/lib/utils/constants.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -72,7 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
         () => messageWidgets.insert(
           0,
           MessageBubble(
-            sender: '@witball',
+            sender: '@witbot',
             response: data,
             isMe: false,
             color: Colors.white,
@@ -141,6 +142,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(4.0),
@@ -158,129 +160,145 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.close),
+              icon: Icon(Icons.more_vert),
               onPressed: () {
                 //Implement logout functionality
               }),
         ],
-        title: Text('FooBall Chat'),
+        title: Text('Witball Chat'),
         backgroundColor: colors[teamName],
       ),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            // Column(
-            //   children: messageWidgets,
-            // ),
-            Expanded(
-              child: Container(
-                child: ListView.builder(
-                    padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
-                    reverse: true,
-                    controller: scrollController,
-                    physics: BouncingScrollPhysics(),
-                    itemCount: messageWidgets.length,
-                    itemBuilder: (context, index) => messageWidgets[index]),
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              colorFilter: ColorFilter.mode(
+                  Colors.transparent.withOpacity(0.5), BlendMode.colorDodge),
+              image: AssetImage("images/background.jpg"),
+              fit: BoxFit.cover,
             ),
-            Container(
-              padding: EdgeInsets.only(left: 8.0, bottom: 8, right: 8, top: 4),
-              decoration: kMessageContainerDecoration,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      maxLines: null,
-                      textCapitalization: TextCapitalization.sentences,
-                      controller: messageController,
-                      keyboardType: micListening ? null : TextInputType.text,
-                      decoration: kMessageTextFieldDecoration.copyWith(
-                        prefixIcon: GestureDetector(
-                          child: micListening
-                              ? Icon(
-                                  Icons.mic,
-                                )
-                              : Icon(
-                                  Icons.mic_off,
-                                  color: Colors.grey,
-                                ),
-                          onTap: () {
-                            if (micListening) {
-                              setState(() {
-                                micListening = !micListening;
-                              });
-                              if (speech.isListening) {
-                                stopListening();
-                              }
-                            } else {
-                              requestPermission();
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // Column(
+              //   children: messageWidgets,
+              // ),
+              Expanded(
+                child: Container(
+                  child: ListView.builder(
+                      padding: EdgeInsets.fromLTRB(20.0, 20, 20, 10),
+                      reverse: true,
+                      controller: scrollController,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: messageWidgets.length,
+                      itemBuilder: (context, index) => messageWidgets[index]),
+                ),
+              ),
+              Container(
+                padding:
+                    EdgeInsets.only(left: 8.0, bottom: 8, right: 8, top: 4),
+                decoration: kMessageContainerDecoration,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: Material(
+                        elevation: 4,
+                        borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                        child: TextField(
+                          maxLines: null,
+                          textCapitalization: TextCapitalization.sentences,
+                          controller: messageController,
+                          keyboardType:
+                              micListening ? null : TextInputType.text,
+                          decoration: kMessageTextFieldDecoration.copyWith(
+                            prefixIcon: GestureDetector(
+                              child: micListening
+                                  ? Icon(
+                                      Icons.mic,
+                                    )
+                                  : Icon(
+                                      Icons.mic_off,
+                                      color: Colors.grey,
+                                    ),
+                              onTap: () {
+                                if (micListening) {
+                                  setState(() {
+                                    micListening = !micListening;
+                                  });
+                                  if (speech.isListening) {
+                                    stopListening();
+                                  }
+                                } else {
+                                  requestPermission();
 
-                              setState(() {
-                                micListening = !micListening;
-                              });
-                              if (!(!_hasSpeech || speech.isListening)) {
-                                startListening();
-                              }
-                            }
-                          },
-                        ),
-                        hintText: micListening
-                            ? "Listening voice....."
-                            : 'Type your message here...',
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  FloatingActionButton(
-                    backgroundColor: colors[teamName],
-                    onPressed: () {
-                      setState(() {
-                        //Send the message as JSON data to send_message event
-                        socketIO.sendMessage(
-                          'send_query',
-                          json.encode({'message': messageController.text}),
-                        );
-                        messageWidgets.insert(
-                          0,
-                          MessageBubble(
-                            sender: '@$name',
-                            response: {
-                              'type': 'string',
-                              'message': messageController.text,
-                            },
-                            isMe: true,
-                            color: colors[teamName],
+                                  setState(() {
+                                    micListening = !micListening;
+                                  });
+                                  if (!(!_hasSpeech || speech.isListening)) {
+                                    startListening();
+                                  }
+                                }
+                              },
+                            ),
+                            hintText: micListening
+                                ? "Listening voice....."
+                                : 'Type your message here...',
                           ),
-                        );
-                        messageController.clear();
-                        scrollController.animateTo(
-                          scrollController.position.maxScrollExtent,
-                          duration: Duration(milliseconds: 600),
-                          curve: Curves.ease,
-                        );
-                      });
-                    },
-                    child: Transform.rotate(
-                      angle: -math.pi / 6,
-                      child: Icon(
-                        Icons.send,
-                        size: 24,
+                        ),
                       ),
                     ),
-                    // child: Text(
-                    //   'Send',
-                    //   style: kSendButtonTextStyle,
-                    // ),
-                  ),
-                ],
+                    SizedBox(
+                      width: 8,
+                    ),
+                    FloatingActionButton(
+                      backgroundColor: colors[teamName],
+                      onPressed: () {
+                        setState(() {
+                          //Send the message as JSON data to send_message event
+                          socketIO.sendMessage(
+                            'send_query',
+                            json.encode({'message': messageController.text}),
+                          );
+                          messageWidgets.insert(
+                            0,
+                            MessageBubble(
+                              sender: '@$name',
+                              response: {
+                                'type': 'string',
+                                'message': messageController.text,
+                              },
+                              isMe: true,
+                              color: colors[teamName],
+                            ),
+                          );
+                          messageController.clear();
+                          scrollController.animateTo(
+                            scrollController.position.maxScrollExtent,
+                            duration: Duration(milliseconds: 600),
+                            curve: Curves.ease,
+                          );
+                        });
+                      },
+                      child: Transform.rotate(
+                        angle: -math.pi / 6,
+                        child: Icon(
+                          Icons.send,
+                          size: 24,
+                        ),
+                      ),
+                      // child: Text(
+                      //   'Send',
+                      //   style: kSendButtonTextStyle,
+                      // ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

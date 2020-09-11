@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/rounded_button.dart';
 import 'package:hive/hive.dart';
+
+import 'file:///C:/Users/Darlene/AndroidStudioProjects/FlutterProjects/foo_bot/lib/utils/constants.dart';
 
 import 'chat_screen.dart';
 
@@ -36,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     'West Ham United': Colors.pink[900],
     'Wolverhampton Wanderers': Colors.amber[600]
   };
-  String _selectedTeam = "Select your team";
+  String _selectedTeam = "";
 
   @override
   void initState() {
@@ -51,99 +52,120 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
-        height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Hero(
-                tag: 'logo',
-                child: Container(
-                  height: 200.0,
-                  child: Image.asset('images/logo.png'),
-                ),
+      body: SingleChildScrollView(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Image.asset('images/background.jpg')),
+            Container(
+              // alignment: Alignment.center,
+              // height: MediaQuery.of(context).size.height,
+              margin: EdgeInsets.symmetric(horizontal: 12.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+              decoration: BoxDecoration(
+                color: Color(0xccffffff),
+                borderRadius: BorderRadius.circular(32.0),
               ),
-              SizedBox(
-                height: 48.0,
-              ),
-              TextField(
-                onChanged: (value) {
-                  box.put('name', value);
-                },
-                decoration: kTextFieldDecoration.copyWith(
-                  hintText: 'Enter your name',
-                  focusColor: Colors.white,
-                ),
-              ),
-              SizedBox(
-                height: 8.0,
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 16, right: 16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blueAccent),
-                  borderRadius: BorderRadius.circular(32.0),
-                ),
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  underline: Container(),
-                  items: <String>[
-                    'Arsenal',
-                    'Aston Villa',
-                    'Brighton & Hove Albion',
-                    'Burnley',
-                    'Chelsea',
-                    'Crystal Palace',
-                    'Everton',
-                    'Fulham',
-                    'Leeds United',
-                    'Leicester City',
-                    'Liverpool',
-                    'Manchester City',
-                    'Manchester United',
-                    'Newcastle United',
-                    'Sheffield United',
-                    'Southampton',
-                    'Tottenham Hotspur',
-                    'West Bromwich Albion',
-                    'West Ham United',
-                    'Wolverhampton Wanderers'
-                  ].map((String value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: new Text(value),
-                      onTap: () {
-                        box.put('teamName', value);
-                        box.put('color', colors[value]);
-                        setState(() {
-                          _selectedTeam = value;
-                        });
-                      },
-                    );
-                  }).toList(),
-                  onChanged: (_) {},
-                  hint: Text(
-                    "$_selectedTeam",
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Hero(
+                    tag: 'logo',
+                    child: Container(
+                      height: 200.0,
+                      child: Image.asset('images/logo.png'),
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    height: 48.0,
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      box.put('name', value);
+                    },
+                    decoration: kTextFieldDecoration.copyWith(
+                      filled: true,
+                      fillColor: Colors.white70,
+                      hintText: 'Enter your name',
+                      focusColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8.0,
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 16, right: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white70,
+                      border: Border.all(color: Colors.blueAccent),
+                      borderRadius: BorderRadius.circular(32.0),
+                    ),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      underline: Container(),
+                      items: <String>[
+                        'Arsenal',
+                        'Aston Villa',
+                        'Brighton & Hove Albion',
+                        'Burnley',
+                        'Chelsea',
+                        'Crystal Palace',
+                        'Everton',
+                        'Fulham',
+                        'Leeds United',
+                        'Leicester City',
+                        'Liverpool',
+                        'Manchester City',
+                        'Manchester United',
+                        'Newcastle United',
+                        'Sheffield United',
+                        'Southampton',
+                        'Tottenham Hotspur',
+                        'West Bromwich Albion',
+                        'West Ham United',
+                        'Wolverhampton Wanderers'
+                      ].map((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: new Text(value),
+                          onTap: () {
+                            box.put('teamName', value);
+                            box.put('color', colors[value]);
+                            setState(() {
+                              _selectedTeam = value;
+                            });
+                          },
+                        );
+                      }).toList(),
+                      onChanged: (_) {},
+                      hint: Text(
+                        _selectedTeam == ""
+                            ? "Select your team"
+                            : "$_selectedTeam",
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 24.0,
+                  ),
+                  RoundedButton(
+                    title: 'Lets Go!',
+                    colour: _selectedTeam != ''
+                        ? colors[_selectedTeam]
+                        : Colors.lightBlueAccent,
+                    onPressed: () async {
+                      Navigator.pushReplacementNamed(context, ChatScreen.id);
+                    },
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 24.0,
-              ),
-              RoundedButton(
-                title: 'Lets Go!',
-                colour: Colors.lightBlueAccent,
-                onPressed: () async {
-                  Navigator.pushReplacementNamed(context, ChatScreen.id);
-                },
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

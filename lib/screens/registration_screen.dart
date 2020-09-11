@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foo_bot/constants.dart';
 import 'package:foo_bot/widgets/rounded_button.dart';
+
+import 'file:///C:/Users/Darlene/AndroidStudioProjects/FlutterProjects/foo_bot/lib/utils/constants.dart';
 
 import 'chat_screen.dart';
 

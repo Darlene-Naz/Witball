@@ -57,10 +57,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   void navigationPage() {
     if (box.get('name') != null) {
-      _controller.dispose();
       Navigator.pushReplacementNamed(context, ChatScreen.id);
     } else {
-      _controller.dispose();
       Navigator.pushReplacementNamed(context, LoginScreen.id);
     }
   }
@@ -76,8 +74,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -111,14 +109,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                       ),
                     ),
-                    TyperAnimatedTextKit(
-                      text: ['WitBall Chat _'],
+                    TypewriterAnimatedTextKit(
+                      text: ['WitBall Chat'],
                       textStyle: TextStyle(
                         fontSize: 40.0,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                       ),
-                      speed: Duration(milliseconds: 200),
+                      speed: Duration(milliseconds: 300),
                     ),
                   ],
                 ),
