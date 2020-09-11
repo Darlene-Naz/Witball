@@ -50,10 +50,12 @@ class PlayerTile extends StatelessWidget {
                       SizedBox(
                         width: 10,
                       ),
-                      Text(
-                        name,
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
+                      Container(
+                        child: Text(
+                          name,
+                          softWrap: false,
+                          overflow: TextOverflow.clip,
+                        ),
                       ),
                     ],
                   ),
@@ -126,10 +128,12 @@ class PlayerTile extends StatelessWidget {
                     SizedBox(
                       width: 10,
                     ),
-                    Text(
-                      name,
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
+                    Expanded(
+                      child: Text(
+                        name,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
                     ),
                   ],
                 ),
