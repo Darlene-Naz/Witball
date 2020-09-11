@@ -47,13 +47,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       setState(() {});
     });
     openBox();
-    startTime();
+//    startTime();
   }
 
-  startTime() async {
-    var _duration = new Duration(seconds: 10);
-    return new Timer(_duration, navigationPage);
-  }
+//  startTime() async {
+//    var _duration = new Duration(seconds: 10);
+//    return new Timer(_duration, navigationPage);
+//  }
 
   void navigationPage() {
     if (box.get('name') != null) {
@@ -67,6 +67,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     var dir = await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
     box = await Hive.openBox('data');
+    print(box.get('name'));
+    box.put('name', null);
+    if (box.get('name') != null) {
+//      Navigator.pushReplacementNamed(context, ChatScreen.id);
+    } else {
+      print('login');
+      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
+    }
     this.setState(() {
       loading = false;
     });

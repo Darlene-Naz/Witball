@@ -44,7 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     super.dispose();
-    messageController.dispose();
+//    messageController.dispose();
   }
 
   @override
@@ -86,7 +86,6 @@ class _ChatScreenState extends State<ChatScreen> {
         curve: Curves.ease,
       );
     });
-
     //Connect to the socket
     socketIO.connect();
     initSpeechState();
