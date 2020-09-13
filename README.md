@@ -11,6 +11,8 @@ Presenting <b>Witball</b>! A <b>Wit.AI</b> powered <b>Flutter Application</b> th
 ## How we built it
 <ul><li>The application is built using Flutter. Flutter is a hybrid app development framework which can create apps for both Android and iOS at the same time!</li><li> The application is connected to our Server using sockets and messages are streamed to & from the application to the server. </li><li>The server then gets each message and detects the Wit.AI bot detects the intent from the text.</li><li> Based on the intent an appropriate message is then sent back to the user.</li></ul>
 
+<img src="https://i.ibb.co/rxwcJ9k/flow-diagram.png" height="600px" width="800px"/>
+
 ## Challenges we ran into
 <ul><li>Creating a socket connection between the mobile application and server was a challenging task.</li>
 <li>
