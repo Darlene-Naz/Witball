@@ -70,8 +70,9 @@ class MessageBubble extends StatelessWidget {
                     sender: '@witbot',
                     response: {
                       'type': 'string',
-                      'message':
-                          'Oops! Some error may have occurred while fetching ${response['teamName']}\'s score'
+                      'message': response['object'] != null
+                          ? '${response['teamName']}\'s score: ${response['object']}'
+                          : 'Oops! Some error may have occurred while fetching ${response['teamName']}\'s score'
                     },
                     isMe: false,
                   );
